@@ -4,7 +4,6 @@ import com.project.uber.UberApp.DTO.DriverDTO;
 import com.project.uber.UberApp.DTO.SignupPDTO;
 import com.project.uber.UberApp.DTO.UserDTO;
 import com.project.uber.UberApp.Entities.User;
-import com.project.uber.UberApp.Entities.Wallet;
 import com.project.uber.UberApp.Entities.enums.Role;
 import com.project.uber.UberApp.Exceptions.RuntimeConflictException;
 import com.project.uber.UberApp.Services.AuthService;
@@ -13,6 +12,7 @@ import com.project.uber.UberApp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -30,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public UserDTO signup(SignupPDTO signupDto) {
         User user = userRepository.findByEmail(signupDto.getEmail()).orElse(null);
         if(user != null)
