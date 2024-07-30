@@ -1,8 +1,7 @@
 package com.project.uber.UberApp.Entities;
 
-import jakarta.persistence.*;
-
 import com.project.uber.UberApp.Entities.enums.Role;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
