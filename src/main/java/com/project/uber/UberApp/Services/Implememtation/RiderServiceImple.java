@@ -4,20 +4,24 @@ import com.project.uber.UberApp.DTO.DriverDTO;
 import com.project.uber.UberApp.DTO.RideDTO;
 import com.project.uber.UberApp.DTO.RideRequeatDTO;
 import com.project.uber.UberApp.DTO.RiderDTO;
-import com.project.uber.UberApp.Entities.RideRequest;
-import com.project.uber.UberApp.Entities.Rider;
-import com.project.uber.UberApp.Entities.User;
+import com.project.uber.UberApp.Entities.*;
 import com.project.uber.UberApp.Entities.enums.RideRequestStatus;
+import com.project.uber.UberApp.Entities.enums.RideStatus;
+import com.project.uber.UberApp.Exceptions.ResourceNotFoundException;
+import com.project.uber.UberApp.Services.DriverService;
+import com.project.uber.UberApp.Services.RideService;
 import com.project.uber.UberApp.Services.RiderService;
-import com.project.uber.UberApp.Strategies.DriverMatchStratergy;
-import com.project.uber.UberApp.Strategies.RideFareCalculationStratergy;
+
+import com.project.uber.UberApp.Strategies.RideStratergyManager;
 import com.project.uber.UberApp.repositories.RideRequestRepository;
 import com.project.uber.UberApp.repositories.RiderRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,33 +31,46 @@ import java.util.List;
 public class RiderServiceImple implements RiderService {
 
     private final ModelMapper modelMapper;
-
-    private final RideFareCalculationStratergy rideFareCalculationStratergyd;
-
-    private final DriverMatchStratergy driverMatchStratergy;
-
+    private final RideStratergyManager rideStratergyManager;
     private final RideRequestRepository rideRequestRepository;
-
     private final RiderRepository riderRepository;
+    private final RideService rideService;
+    private  final DriverService driverService;
 
     @Override
-
+    @Transactional
     public RideRequeatDTO requestRide(RideRequeatDTO rideRequestDTO) {
 
+        Rider rider = getCurrentRider();
         RideRequest rideRequest = modelMapper.map(rideRequestDTO,RideRequest.class);
          rideRequest.setRideRequestStatus(RideRequestStatus.PENDING);
+         rideRequest.setRider(rider);
 
-         Double fair = rideFareCalculationStratergyd.calculateFare(rideRequest);
-         rideRequest.setFare(fair);
+         Double fare = rideStratergyManager.rideFareCalculationStrategy().calculateFare(rideRequest);
+         rideRequest.setFare(fare);
 
          RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
-         driverMatchStratergy.matchMatchingDriver(rideRequest);
-         return modelMapper.map(rideRequest,RideRequeatDTO.class);
+         List <Driver> drivers = rideStratergyManager.driverMatchingStrategy(rider.getRating()).matchMatchingDriver(rideRequest);
+         return modelMapper.map(savedRideRequest,RideRequeatDTO.class);
     }
+
 
     @Override
     public RideDTO cancelRide(Long rideId) {
-        return null;
+        Rider rider = getCurrentRider();
+        Ride ride =   rideService.getRideById(rideId);
+
+        if(rider.equals(ride.getRider())){
+            throw new RuntimeException("Rider does not own this ride");
+        }
+        if(!ride.getRideStatus().equals(RideStatus.CONFIRMED)){
+            throw new RuntimeException("Ride cannot be cancelled Ride is "+ ride.getRideStatus());
+        }
+
+        Ride savedRide = rideService.updateRideStatus(ride, RideStatus.CANCELLED);
+        driverService.updateDriverAvailability(ride.getDriver(), true);
+
+        return modelMapper.map(savedRide, RideDTO.class);
     }
 
     @Override
@@ -63,12 +80,17 @@ public class RiderServiceImple implements RiderService {
 
     @Override
     public RiderDTO getMyProfile() {
-        return null;
+        Rider currentRider = getCurrentRider();
+        return  modelMapper.map(currentRider,RiderDTO.class);
     }
 
     @Override
-    public List<RideDTO> getAllMyRides() {
-        return null;
+    public Page<RideDTO> getAllMyRides(PageRequest pageRequest) {
+        Rider currentRider = getCurrentRider();
+        return rideService.getAllRidesofRider(currentRider, pageRequest).map(
+                ride -> modelMapper.map(ride, RideDTO.class)
+
+        );
     }
 
     @Override
@@ -78,4 +100,14 @@ public class RiderServiceImple implements RiderService {
 
         return riderRepository.save(rider);
     }
+
+    @Override
+    public Rider getCurrentRider() {
+        return riderRepository.findById(1L).orElseThrow(() -> new ResourceNotFoundException("" +
+                "Rider not found"));
+    }
+
+
+
+
 }

@@ -2,8 +2,6 @@ package com.project.uber.UberApp.Controller;
 
 import com.project.uber.UberApp.DTO.RideRequeatDTO;
 import com.project.uber.UberApp.Services.RiderService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
