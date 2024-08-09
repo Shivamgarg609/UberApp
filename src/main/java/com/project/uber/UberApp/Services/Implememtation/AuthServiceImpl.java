@@ -8,6 +8,7 @@ import com.project.uber.UberApp.Entities.enums.Role;
 import com.project.uber.UberApp.Exceptions.RuntimeConflictException;
 import com.project.uber.UberApp.Services.AuthService;
 import com.project.uber.UberApp.Services.RiderService;
+import com.project.uber.UberApp.Services.WalleteService;
 import com.project.uber.UberApp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
-
+    private final WalleteService walletService;
     private final RiderService riderService;
     @Override
     public void login(String email, String password) {
@@ -42,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
 //        create user related entities
         riderService.createNewRider(savedUser);
-//        TODO add wallet related service here
+        walletService.createNewWallet(savedUser);
 
         return modelMapper.map(savedUser, UserDTO.class);
     }

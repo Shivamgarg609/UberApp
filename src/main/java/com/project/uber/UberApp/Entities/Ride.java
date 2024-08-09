@@ -1,10 +1,11 @@
 package com.project.uber.UberApp.Entities;
 
 import com.project.uber.UberApp.Entities.enums.PaymentMethods;
-import com.project.uber.UberApp.Entities.enums.RideRequestStatus;
 import com.project.uber.UberApp.Entities.enums.RideStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.locationtech.jts.geom.Point;
@@ -13,9 +14,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-//@Getter
-//@Setter
-public class Ride implements Serializable {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Ride  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +49,7 @@ public class Ride implements Serializable {
 
     private String OTP;
 
-    private LocalDateTime startTime;
+    private LocalDateTime startedAt;
 
-    private LocalDateTime endTime;
+    private LocalDateTime endedAt;
 }

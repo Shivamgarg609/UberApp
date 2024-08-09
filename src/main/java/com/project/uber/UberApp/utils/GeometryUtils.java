@@ -2,11 +2,9 @@ package com.project.uber.UberApp.utils;
 
 import com.project.uber.UberApp.DTO.PointDTO;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-
-import java.awt.*;
 
 public class GeometryUtils {
 

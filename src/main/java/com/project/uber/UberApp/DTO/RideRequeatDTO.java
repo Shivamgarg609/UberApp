@@ -4,12 +4,11 @@ import com.project.uber.UberApp.Entities.Driver;
 import com.project.uber.UberApp.Entities.Rider;
 import com.project.uber.UberApp.Entities.enums.PaymentMethods;
 import com.project.uber.UberApp.Entities.enums.RideRequestStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 
@@ -36,9 +35,11 @@ public class RideRequeatDTO {
 
     private Driver driver;
 
-    @Enumerated(EnumType.STRING)
+
     private PaymentMethods paymentMethod;
 
-    @Enumerated(EnumType.STRING)
+
     private RideRequestStatus rideRequestStatus;
+
+    private Double fare;
 }

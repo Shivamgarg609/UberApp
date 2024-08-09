@@ -1,30 +1,29 @@
 package com.project.uber.UberApp.DTO;
 
-import com.project.uber.UberApp.Entities.Driver;
-import com.project.uber.UberApp.Entities.Rider;
 import com.project.uber.UberApp.Entities.enums.PaymentMethods;
 import com.project.uber.UberApp.Entities.enums.RideStatus;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.locationtech.jts.geom.Point;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 public class RideDTO {
 
     private  Long id;
 
 
-    private Point pickupLocation;
+    private PointDTO pickupLocation;
 
 
-    private Point dropOfLocation;
+    private PointDTO dropOfLocation;
 
 
     private LocalDateTime createdTime;
 
 
-    private Rider rider;
+    private RiderDTO riderDTO;
 
 
     private DriverDTO driver;
@@ -32,12 +31,11 @@ public class RideDTO {
     private String OTP;
     private PaymentMethods paymentMethod;
 
-    @Enumerated(EnumType.STRING)
     private RideStatus rideStatus;
 
-    private boolean fare;
+    private Double fare;
 
-    private LocalDateTime startTime;
+    private LocalDateTime startedAt;
 
-    private LocalDateTime endTime;
+    private LocalDateTime endedAt;
 }
