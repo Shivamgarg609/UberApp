@@ -36,6 +36,8 @@ public class DriverServiceImpl implements DriverService {
     private final ModelMapper modalMapper;
 
     private final PaymentService paymentService;
+
+    private final RatingService ratingService;
     @Override
     @Transactional
     public RideDTO acceptRide(Long rideId) {
@@ -122,7 +124,17 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDTO rateRider(Long rideId, Integer rating) {
-        return null;
+        Driver driver = getCurrentDriver();
+        Ride ride = rideService.getRideById(rideId);
+
+        if(!driver.equals(ride.getDriver())){
+            throw new RuntimeException("Driver cannot rate the rider");
+        }
+
+        if(ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride status is not ended so cannot rate the rider "+ ride.getRideStatus());
+        }
+        return ratingService.rateRider(ride,rating);
     }
 
     @Override
@@ -142,6 +154,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver updateDriverAvailability(Driver driver, boolean available) {
         driver.setAvailable(available);
+        return driverRepository.save(driver);
+    }
+
+    @Override
+    public Driver createNewDriver(Driver driver) {
         return driverRepository.save(driver);
     }
 
