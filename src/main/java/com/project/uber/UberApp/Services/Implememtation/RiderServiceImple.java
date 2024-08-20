@@ -9,6 +9,7 @@ import com.project.uber.UberApp.Entities.enums.RideRequestStatus;
 import com.project.uber.UberApp.Entities.enums.RideStatus;
 import com.project.uber.UberApp.Exceptions.ResourceNotFoundException;
 import com.project.uber.UberApp.Services.DriverService;
+import com.project.uber.UberApp.Services.RatingService;
 import com.project.uber.UberApp.Services.RideService;
 import com.project.uber.UberApp.Services.RiderService;
 
@@ -36,6 +37,7 @@ public class RiderServiceImple implements RiderService {
     private final RiderRepository riderRepository;
     private final RideService rideService;
     private  final DriverService driverService;
+    private final RatingService ratingService;
 
     @Override
     @Transactional
@@ -75,7 +77,17 @@ public class RiderServiceImple implements RiderService {
 
     @Override
     public DriverDTO rateDriver(Long rideId, Integer rating) {
-        return null;
+        Rider rider = getCurrentRider();
+        Ride ride = rideService.getRideById(rideId);
+
+        if(!rider.equals(ride.getDriver())){
+            throw new RuntimeException("Rider cannot rate the rider");
+        }
+
+        if(ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride status is not ended so cannot rate the rider "+ ride.getRideStatus());
+        }
+        return ratingService.rateDriver(ride,rating);
     }
 
     @Override
